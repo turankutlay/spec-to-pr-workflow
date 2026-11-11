@@ -25,18 +25,29 @@ runtime is the wrong version, tracker board and list names, where specs and
 plans are saved. If the section is missing, ask the owner for these once and
 offer to add it.
 
-## Design rules: SOLID, KISS, DRY, YAGNI
+## Design rules
 
-These four bind the planner, the plan reviewers, every implementer and every
-reviewer. Each role has a required output:
+Nine rules bind the planner, the plan reviewers, every implementer and every
+reviewer.
+
+| Rule | Meaning here |
+|------|--------------|
+| SOLID, KISS, DRY, YAGNI | As commonly defined. |
+| Fail loudly | An error never reads as success. A check that cannot run fails. |
+| Least surprise | Messages, flags and defaults say what the code really does. Unknown input is rejected, not ignored. |
+| Measure the cost | A change to a script, query or hot path records its runtime before and after. |
+| Behaviour preservation | Refactor tasks only: a test that pins current behaviour passes before the code moves and passes unchanged after. |
+| Reversibility | The PR states how to roll it back and what breaks if only part of it is deployed. |
+
+Each role has a required output:
 
 | Role | Required output |
 |------|-----------------|
-| Planner (step 2) | A "Design choices" section in the plan: for each non-obvious choice, which rule it serves and what was left out because of YAGNI. |
-| Plan reviewer for design (step 3) | A verdict per rule (SOLID, KISS, DRY, YAGNI): pass, or the task and line that breaks it. |
-| Implementer (step 5) | The four rules are in every task brief. The report lists anything added beyond the brief; the expected answer is "nothing". |
+| Planner (step 2) | A "Design choices" section in the plan: for each non-obvious choice, which rule it serves and what was left out because of YAGNI. Plus the rollback, and which tasks need a runtime measurement or a behaviour-pinning test. |
+| Plan reviewer for design (step 3) | A verdict per rule, all nine: pass, not applicable, or the task and line that breaks it. |
+| Implementer (step 5) | The nine rules are in every task brief. The report lists anything added beyond the brief (expected: "nothing") and any before and after runtime the plan asked for. |
 | Task reviewer (step 5) | A verdict per rule on the diff, next to the spec-compliance verdict. |
-| Branch reviewer (step 6) | The same four verdicts for the whole diff: duplication between tasks, abstractions with one user, code no task asked for. |
+| Branch reviewer (step 6) | The same nine verdicts for the whole diff: duplication between tasks, abstractions with one user, code no task asked for, errors that read as success. |
 
 When two rules disagree, KISS and correct behaviour win over DRY: reuse an
 existing function only if its behaviour, messages and cost fit the new caller
@@ -62,7 +73,7 @@ as they are. Say so in "Design choices".
 |---|------|------|
 | 1 | Pick the next card; check its dependencies are merged and its open decisions are answered. Move the card to "in progress". Branch from the fresh base branch. | |
 | 2 | Write the plan in tasks that can each be tested alone, with its "Design choices" section. Prototype the risky part. | |
-| 3 | **Plan review: two independent agents.** One checks the plan against the spec and card (complete, nothing extra, behaviour preserved). One checks the design against the four design rules and that each task is testable alone. Fix the findings. | Plan review |
+| 3 | **Plan review: two independent agents.** One checks the plan against the spec and card (complete, nothing extra, behaviour preserved). One checks the design against the nine design rules and that each task is testable alone. Fix the findings. | Plan review |
 | 4 | Show the owner the plan **and** the reviewers' findings. | **Owner decides** |
 | 5 | Build one task at a time: fresh implementer, then a separate reviewer, then fixes and re-review. **Every task gets a reviewer, including a task you do yourself.** | Task review |
 | 6 | Whole-branch review by an agent on the most capable model. One fix agent for all findings; verify the fixes yourself. | Branch review |
@@ -91,7 +102,9 @@ If a fix after step 7 changes code, rerun step 8 before the push.
 
 ## Gate table (required in the step 10 report and in every PR description)
 
-Fill in every row. "Not run" needs a reason and stays visible.
+Fill in every row. "Not run" needs a reason and stays visible. The "Runtime
+before and after" and "Rollback" rows are written by you, so they are never
+"not run": fill them before step 10.
 
 ```markdown
 | Gate | Result |
@@ -102,6 +115,8 @@ Fill in every row. "Not run" needs a reason and stays visible.
 | Code review (high) | <n found, n fixed, n left for owner: ...> |
 | Pre-push checks | <each command: passed, where it ran / not run, why> |
 | Open-PR check | <PRs read; conflicts or none> |
+| Runtime before and after | <what was measured: before, after / no script, query or hot path changed> |
+| Rollback | <how to revert; what breaks if only part is deployed> |
 | Not verified | <what, or "nothing"> |
 ```
 
