@@ -22,8 +22,10 @@ superpowers:subagent-driven-development, and the `code-review` skill.
 Read the `## Delivery workflow` section of the project's CLAUDE.md for: base
 branch, branch naming, pre-push commands, how to run them when the local
 runtime is the wrong version, tracker board and list names, where specs and
-plans are saved. If the section is missing, ask the owner for these once and
-offer to add it.
+plans are saved, how to start the application locally, which clients use it
+(web, mobile) and how to start each, where the test accounts are, and the URL
+of the test environment the base branch deploys to. If the section is missing,
+ask the owner for these once and offer to add it.
 
 ## Design rules
 
@@ -79,17 +81,19 @@ as they are. Say so in "Design choices".
 | 6 | Whole-branch review by an agent on the most capable model. One fix agent for all findings; verify the fixes yourself. | Branch review |
 | 7 | Run the `code-review` skill at high effort with `--fix` on the branch. This is in addition to step 6. | Code review |
 | 8 | Run every pre-push command from the project settings. If the local runtime cannot run one, use the project's container or other documented way. | Pre-push checks |
-| 9 | Open-PR check: read the **diff** of every open PR against the base branch, not its title or file list. Look for the same files, and for anything this branch freezes or counts (baselines, snapshots, allowlists, generated files). A conflict goes to the owner with a recommended merge order. | Open-PR check |
-| 10 | Report the gate table (below) and ask to push. | **Owner decides** |
-| 11 | Push, open the PR against the base branch with the gate table in the description, move the card to "in review", add the PR link. Read the CI result. | |
-| 12 | If the base branch moves: rebase, regenerate anything frozen, rerun the tests, push with `--force-with-lease`, update the description. | |
-| 13 | Owner reviews and merges. Never merge and never push to the base or production branch. | **Owner decides** |
-| 14 | Move the card to "done". Say in one or two lines what is next. | |
+| 9 | **Run it.** If the diff changes code the application executes (anything other than docs, tests, CI or tooling): start the application locally, call every changed endpoint, and walk the user flow that uses it in each client the project settings name (browser, mobile emulator). Use test accounts only, never production and never the owner's real credentials. Record what was exercised and what was seen. | Run it |
+| 10 | Open-PR check: read the **diff** of every open PR against the base branch, not its title or file list. Look for the same files, and for anything this branch freezes or counts (baselines, snapshots, allowlists, generated files). A conflict goes to the owner with a recommended merge order. | Open-PR check |
+| 11 | Report the gate table (below) and ask to push. | **Owner decides** |
+| 12 | Push, open the PR against the base branch with the gate table in the description, move the card to "in review", add the PR link. Read the CI result. | |
+| 13 | If the base branch moves: rebase, regenerate anything frozen, rerun the tests, push with `--force-with-lease`, update the description. | |
+| 14 | Owner reviews and merges. Never merge and never push to the base or production branch. | **Owner decides** |
+| 15 | **Staging smoke check.** If step 9 ran and the base branch deploys to a test environment: once the deploy is live, repeat the step 9 flow there and report the result to the owner and on the PR. A failure goes to the owner at once with the rollback from the gate table. | Staging check |
+| 16 | Move the card to "done" only after step 15 passed or did not apply. Say in one or two lines what is next. | |
 
 ### Earlier approval
 
 An earlier "push when it's done" or "just start" is the owner's decision at
-step 4 or step 10. It does not remove a gate. Run the gates first.
+step 4 or step 11. It does not remove a gate. Run the gates first.
 
 - If every gate ran and is clean: act on the earlier approval without waiting,
   and still send the plan findings or the gate table.
@@ -98,13 +102,13 @@ step 4 or step 10. It does not remove a gate. Run the gates first.
   review left a finding for the owner: stop and wait for the owner. The
   earlier approval did not cover it.
 
-If a fix after step 7 changes code, rerun step 8 before the push.
+If a fix after step 7 changes code, rerun steps 8 and 9 before the push.
 
-## Gate table (required in the step 10 report and in every PR description)
+## Gate table (required in the step 11 report and in every PR description)
 
 Fill in every row. "Not run" needs a reason and stays visible. The "Runtime
 before and after" and "Rollback" rows are written by you, so they are never
-"not run": fill them before step 10.
+"not run": fill them before step 11.
 
 ```markdown
 | Gate | Result |
@@ -114,6 +118,7 @@ before and after" and "Rollback" rows are written by you, so they are never
 | Branch review | <findings fixed / none> |
 | Code review (high) | <n found, n fixed, n left for owner: ...> |
 | Pre-push checks | <each command: passed, where it ran / not run, why> |
+| Run it | <endpoints called and flows walked, in which client, what was seen / diff has no application code> |
 | Open-PR check | <PRs read; conflicts or none> |
 | Runtime before and after | <what was measured: before, after / no script, query or hot path changed> |
 | Rollback | <how to revert; what breaks if only part is deployed> |
@@ -130,4 +135,6 @@ before and after" and "Rollback" rows are written by you, so they are never
 | "The branch review was clean, code review is a repeat" | They find different things. Run both, before the PR. |
 | "CI runs the tests anyway" | The project asks for local checks before the push. Use the container. |
 | "I looked at the open PRs' file lists" | A one-line change in an unrelated-looking PR can break a frozen baseline. Read the diffs. |
-| "The owner already said push" | That answers step 10. The gates before it still run. |
+| "The owner already said push" | That answers step 11. The gates before it still run. |
+| "The tests pass, no need to start the app" | Tests check what the author thought of. Running it shows what the user gets. |
+| "It is merged, the card is done" | Done is after the flow works on the test environment. |
