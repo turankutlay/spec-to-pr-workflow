@@ -1,140 +1,145 @@
 ---
 name: spec-to-pr-workflow
-description: Use when starting a refactor or multi-PR piece of work that needs a spec and tracker cards, when picking up a tracker card to turn into a pull request, when about to execute an implementation plan, or when about to push a branch and open a pull request
+description: Use when starting a refactor or multi-PR piece of work that needs a spec and tracker cards, when picking up a tracker card or task to turn into a pull request, when about to execute an implementation plan, or when about to push a branch and open a pull request
 ---
 
 # Spec to PR workflow
 
 ## Overview
 
-A fixed sequence of review gates between an idea and a merged pull request. The
-owner decides at four points; everything else runs without asking.
+The owner hands over a task and gets back a pull request that is tested, run,
+reviewed for quality and ready to merge, with the evidence in one table.
 
-**Each gate is cheap before the next step and expensive after it.** A gate that
-was not run is reported as not run. It is never dropped silently and never
-replaced by a later gate ("CI will catch it", "the final review covered it").
+This skill fixes three things: **what done means**, **the quality the code must
+have**, and **when to stop for the owner**. How you get there is your choice:
+use your own judgment and the installed skills (planning, subagents, code
+review). Do not stop to ask outside the listed stop points.
 
-**REQUIRED SUB-SKILLS:** superpowers:brainstorming, superpowers:writing-plans,
-superpowers:subagent-driven-development, and the `code-review` skill.
+A check that did not run is reported as not run, with the reason. It is never
+dropped and never replaced by a later check ("CI will catch it").
 
 ## Project settings
 
-Read the `## Delivery workflow` section of the project's CLAUDE.md for: base
-branch, branch naming, pre-push commands, how to run them when the local
-runtime is the wrong version, tracker board and list names, where specs and
-plans are saved, how to start the application locally, which clients use it
-(web, mobile) and how to start each, where the test accounts are, and the URL
-of the test environment the base branch deploys to. If the section is missing,
-ask the owner for these once and offer to add it.
+Read the `## Delivery workflow` section of the project's CLAUDE.md: base
+branch, pre-push commands and how to run them when the local runtime is the
+wrong version, how to start the application and its clients, test accounts,
+test environment, tracker, and how the project rates risk. If the section is
+missing, ask the owner once and offer to add it.
 
-## Design rules
+## Risk
 
-Nine rules bind the planner, the plan reviewers, every implementer and every
-reviewer.
+Rate the task before starting, say the rating and why, and use the higher
+level when unsure.
 
-| Rule | Meaning here |
-|------|--------------|
-| SOLID, KISS, DRY, YAGNI | As commonly defined. |
-| Fail loudly | An error never reads as success. A check that cannot run fails. |
-| Least surprise | Messages, flags and defaults say what the code really does. Unknown input is rejected, not ignored. |
-| Measure the cost | A change to a script, query or hot path records its runtime before and after. |
-| Behaviour preservation | Refactor tasks only: a test that pins current behaviour passes before the code moves and passes unchanged after. |
-| Reversibility | The PR states how to roll it back and what breaks if only part of it is deployed. |
+| Level | Typical signs |
+|-------|---------------|
+| Low | Docs, tooling, CI, dead-code removal, mechanical moves fully covered by tests |
+| Medium | Changes the structure of code the application runs; behaviour must stay the same and tests cover it |
+| High | Money, authentication, data migration or deletion, a public API contract, or code without test coverage |
 
-Each role has a required output:
+## Code quality (every PR that contains code, at every risk level)
 
-| Role | Required output |
-|------|-----------------|
-| Planner (step 2) | A "Design choices" section in the plan: for each non-obvious choice, which rule it serves and what was left out because of YAGNI. Plus the rollback, and which tasks need a runtime measurement or a behaviour-pinning test. |
-| Plan reviewer for design (step 3) | A verdict per rule, all nine: pass, not applicable, or the task and line that breaks it. |
-| Implementer (step 5) | The nine rules are in every task brief. The report lists anything added beyond the brief (expected: "nothing") and any before and after runtime the plan asked for. |
-| Task reviewer (step 5) | A verdict per rule on the diff, next to the spec-compliance verdict. |
-| Branch reviewer (step 6) | The same nine verdicts for the whole diff: duplication between tasks, abstractions with one user, code no task asked for, errors that read as success. |
+Risk changes how many review rounds happen. It never lowers the quality bar.
 
-When two rules disagree, KISS and correct behaviour win over DRY: reuse an
-existing function only if its behaviour, messages and cost fit the new caller
-as they are. Say so in "Design choices".
+The code follows nine rules:
 
-## Part A: idea to tracker cards (once per piece of work)
+- **SOLID, KISS, DRY, YAGNI.** When they disagree, KISS and correct behaviour
+  win over DRY: reuse an existing function only if its behaviour, messages and
+  cost fit the new caller as they are.
+- **Fail loudly.** An error never reads as success; a check that cannot run fails.
+- **Least surprise.** Messages, flags and defaults say what the code really
+  does; unknown input is rejected, not ignored.
+- **Measure the cost.** A change to a script, query or hot path has its runtime
+  measured before and after.
+- **Behaviour preservation** (refactors). A test that pins current behaviour
+  passes before the code moves and passes unchanged after.
+- **Reversibility.** The PR says how to roll it back and what breaks if only
+  part of it is deployed.
 
-1. Owner states the goal and the criteria.
-2. Ask scoping questions one at a time, each with a recommendation. **Owner decides.**
-3. Update the base branch locally. Audit and measure only on it.
-4. Audit with independent agents, one per criterion group. Every claim needs file and line.
-5. Present the design. **Owner decides.**
-6. Write the spec and the card list.
-7. Spec review by independent agents, one aspect each: factual accuracy, card
-   decomposition, behaviour preservation, consistency and scope.
-8. Fix every finding. Record the review in the spec.
-9. Agree how cards batch into PRs and how much is committed. **Owner decides.**
-10. Create the tracker cards. **Owner decides.**
+Three things make this checkable:
 
-## Part B: card to merged PR (every PR)
+1. **Design choices are written down** before building: each non-obvious choice
+   and the rule it serves, and what YAGNI left out.
+2. **Tests are written before the code they test.**
+3. **An independent review of the full diff against each of the nine rules**,
+   by an agent that did not write the code and was not told your conclusions.
+   Your own re-read does not count. Every finding is fixed, or listed for the
+   owner with the reason. Its result fills the "Design rules" row below.
 
-| # | Step | Gate |
-|---|------|------|
-| 1 | Pick the next card; check its dependencies are merged and its open decisions are answered. Move the card to "in progress". Branch from the fresh base branch. | |
-| 2 | Write the plan in tasks that can each be tested alone, with its "Design choices" section. Prototype the risky part. | |
-| 3 | **Plan review: two independent agents.** One checks the plan against the spec and card (complete, nothing extra, behaviour preserved). One checks the design against the nine design rules and that each task is testable alone. Fix the findings. | Plan review |
-| 4 | Show the owner the plan **and** the reviewers' findings. | **Owner decides** |
-| 5 | Build one task at a time: fresh implementer, then a separate reviewer, then fixes and re-review. **Every task gets a reviewer, including a task you do yourself.** | Task review |
-| 6 | Whole-branch review by an agent on the most capable model. One fix agent for all findings; verify the fixes yourself. | Branch review |
-| 7 | Run the `code-review` skill at high effort with `--fix` on the branch. This is in addition to step 6. | Code review |
-| 8 | Run every pre-push command from the project settings. If the local runtime cannot run one, use the project's container or other documented way. | Pre-push checks |
-| 9 | **Run it.** If the diff changes code the application executes (anything other than docs, tests, CI or tooling): start the application locally, call every changed endpoint, and walk the user flow that uses it in each client that calls it (browser, mobile emulator; the project settings say how to start them). Use test accounts only, never production and never the owner's real credentials. Record what was exercised and what was seen. | Run it |
-| 10 | Open-PR check: read the **diff** of every open PR against the base branch, not its title or file list. Look for the same files, and for anything this branch freezes or counts (baselines, snapshots, allowlists, generated files). A conflict goes to the owner with a recommended merge order. | Open-PR check |
-| 11 | Report the gate table (below) and ask to push. | **Owner decides** |
-| 12 | Push, open the PR against the base branch with the gate table in the description, move the card to "in review", add the PR link. Read the CI result. | |
-| 13 | If the base branch moves: rebase, regenerate anything frozen, rerun the tests, push with `--force-with-lease`, update the description. | |
-| 14 | Owner reviews and merges. Never merge and never push to the base or production branch. | **Owner decides** |
-| 15 | **Staging smoke check.** If step 9 ran and the base branch deploys to a test environment: once the deploy is live, repeat the step 9 flow there and report the result to the owner and on the PR. A failure goes to the owner at once with the rollback from the gate table. | Staging check |
-| 16 | Move the card to "done" only after step 15 passed or did not apply. Say in one or two lines what is next. | |
+## What scales with risk
 
-### Earlier approval
+| | Low | Medium | High |
+|---|---|---|---|
+| Plan | Short; goes in the PR description | Written; one independent review; sent to the owner, then continue | Written; independent reviews of spec fit and of design; **owner approves before building** |
+| Independent quality review (above) | Once, on the full diff | Once, on the full diff, plus the `code-review` skill at high effort with `--fix` | Per task and on the full diff by the most capable model, plus `code-review` at high effort with `--fix` |
 
-An earlier "push when it's done" or "just start" is the owner's decision at
-step 4 or step 11. It does not remove a gate. Run the gates first.
+## Definition of done
 
-- If every gate ran and is clean: act on the earlier approval without waiting,
-  and still send the plan findings or the gate table.
-- If a plan reviewer found something that changes scope or behaviour, if the
-  open-PR check found a conflict, if a gate could not run, or if the code
-  review left a finding for the owner: stop and wait for the owner. The
-  earlier approval did not cover it.
+Before the push:
 
-If a fix after step 7 changes code, rerun steps 8 and 9 before the push.
+- Every pre-push command from the project settings passed.
+- **Run it:** if the diff changes code the application executes, the application
+  was started, every changed endpoint was called, and the user flow was walked
+  in each client that calls it. Test accounts only.
+- **Open-PR check:** the diff (not the title or file list) of every open PR
+  against the base branch was read for the same files and for anything this
+  branch freezes or counts.
+- The gate table is complete.
 
-## Gate table (required in the step 11 report and in every PR description)
+Then push the branch and open the PR against the base branch with the gate
+table in the description, read the CI result, and fix failures.
 
-Fill in every row. "Not run" needs a reason and stays visible. The "Runtime
-before and after" and "Rollback" rows are written by you, so they are never
-"not run": fill them before step 11.
+After the owner merges: once the base branch is deployed to the test
+environment, repeat the "Run it" flow there and report the result. The tracker
+card moves to done only after that passed or did not apply.
+
+## Gate table (in every PR description)
 
 ```markdown
 | Gate | Result |
 |------|--------|
-| Plan review (2 agents) | <findings fixed / none> |
-| Task review | <n of n tasks reviewed> |
-| Branch review | <findings fixed / none> |
-| Code review (high) | <n found, n fixed, n left for owner: ...> |
-| Pre-push checks | <each command: passed, where it ran / not run, why> |
-| Run it | <endpoints called and flows walked, in which client, what was seen / diff has no application code> |
+| Risk | <level, why> |
+| Plan | <where it is; who reviewed it; findings fixed> |
+| Design rules | SOLID / KISS / DRY / YAGNI / fail loudly / least surprise / cost / behaviour / reversibility: <pass, n/a, or finding and fix, per rule> |
+| Independent review | <who reviewed what; n found, n fixed, n left for owner> |
+| Tests and pre-push checks | <each command: passed, where it ran / not run, why> |
+| Run it | <endpoints called, flows walked, in which client, what was seen / no application code> |
 | Open-PR check | <PRs read; conflicts or none> |
-| Runtime before and after | <what was measured: before, after / no script, query or hot path changed> |
+| Runtime before and after | <numbers / no script, query or hot path changed> |
 | Rollback | <how to revert; what breaks if only part is deployed> |
 | Not verified | <what, or "nothing"> |
 ```
+
+## Stop for the owner only when
+
+- The task is High risk: before building, for plan approval.
+- A review finding would change scope or intended behaviour. If the finding
+  can be handled by doing less than the task asked, do less, say so in the PR,
+  and continue; stop only when it needs more or something different.
+- An open PR conflicts with this one (give a recommended merge order).
+- A check could not run, or a finding is left that you cannot fix.
+- Anything destructive or hard to undo.
+- Merging, and any push to the base or production branch: always the owner's.
+
+Otherwise keep going until the PR is open and its CI is green.
+
+## New piece of work: spec and cards first
+
+For a refactor or anything spanning several PRs: ask scoping questions one at a
+time with a recommendation; audit the latest base branch with evidence (file
+and line); write a spec and a card list with a risk level per card; have
+independent agents check the spec (facts, card split, behaviour preservation,
+consistency); fix the findings. The owner approves the design, the size of the
+commitment, and creating the cards.
 
 ## Common mistakes
 
 | Thought | Reality |
 |---------|---------|
-| "I prototyped it and re-read the plan" | The author cannot review their own plan. Two independent agents. |
-| "One plan reviewer covers both" | Spec fit and design are different questions. Two agents. |
-| "This task is small, I'll do it myself, no reviewer" | Small unreviewed tasks are where the gaps were found. |
-| "The branch review was clean, code review is a repeat" | They find different things. Run both, before the PR. |
-| "CI runs the tests anyway" | The project asks for local checks before the push. Use the container. |
-| "I looked at the open PRs' file lists" | A one-line change in an unrelated-looking PR can break a frozen baseline. Read the diffs. |
-| "The owner already said push" | That answers step 11. The gates before it still run. |
+| "Low risk, so no quality review" | Risk scales the rounds, not the bar. Every code PR gets the independent nine-rule review. |
+| "I re-read my diff against the rules" | The author cannot be the independent reviewer. |
 | "The tests pass, no need to start the app" | Tests check what the author thought of. Running it shows what the user gets. |
+| "CI runs the tests anyway" | The project asks for local checks before the push. |
+| "I looked at the open PRs' file lists" | A one-line change elsewhere can break a frozen baseline. Read the diffs. |
+| "I'll check in with the owner to be safe" | Outside the stop list, checking in is the failure. Keep going and report in the table. |
 | "It is merged, the card is done" | Done is after the flow works on the test environment. |
