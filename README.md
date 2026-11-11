@@ -8,7 +8,7 @@ request, with four owner decision points per PR.
 Clone this repository into the personal skills folder:
 
 ```bash
-git clone <repo-url> ~/.claude/skills/spec-to-pr-workflow
+git clone https://github.com/turankutlay/spec-to-pr-workflow.git ~/.claude/skills/spec-to-pr-workflow
 ```
 
 Update later with `git -C ~/.claude/skills/spec-to-pr-workflow pull`.
