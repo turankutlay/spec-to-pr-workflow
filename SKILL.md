@@ -25,6 +25,23 @@ runtime is the wrong version, tracker board and list names, where specs and
 plans are saved. If the section is missing, ask the owner for these once and
 offer to add it.
 
+## Design rules: SOLID, KISS, DRY, YAGNI
+
+These four bind the planner, the plan reviewers, every implementer and every
+reviewer. Each role has a required output:
+
+| Role | Required output |
+|------|-----------------|
+| Planner (step 2) | A "Design choices" section in the plan: for each non-obvious choice, which rule it serves and what was left out because of YAGNI. |
+| Plan reviewer for design (step 3) | A verdict per rule (SOLID, KISS, DRY, YAGNI): pass, or the task and line that breaks it. |
+| Implementer (step 5) | The four rules are in every task brief. The report lists anything added beyond the brief; the expected answer is "nothing". |
+| Task reviewer (step 5) | A verdict per rule on the diff, next to the spec-compliance verdict. |
+| Branch reviewer (step 6) | The same four verdicts for the whole diff: duplication between tasks, abstractions with one user, code no task asked for. |
+
+When two rules disagree, KISS and correct behaviour win over DRY: reuse an
+existing function only if its behaviour, messages and cost fit the new caller
+as they are. Say so in "Design choices".
+
 ## Part A: idea to tracker cards (once per piece of work)
 
 1. Owner states the goal and the criteria.
@@ -44,8 +61,8 @@ offer to add it.
 | # | Step | Gate |
 |---|------|------|
 | 1 | Pick the next card; check its dependencies are merged and its open decisions are answered. Move the card to "in progress". Branch from the fresh base branch. | |
-| 2 | Write the plan in tasks that can each be tested alone. Prototype the risky part. | |
-| 3 | **Plan review: two independent agents.** One checks the plan against the spec and card (complete, nothing extra, behaviour preserved). One checks the design choices and that each task is testable alone. Fix the findings. | Plan review |
+| 2 | Write the plan in tasks that can each be tested alone, with its "Design choices" section. Prototype the risky part. | |
+| 3 | **Plan review: two independent agents.** One checks the plan against the spec and card (complete, nothing extra, behaviour preserved). One checks the design against the four design rules and that each task is testable alone. Fix the findings. | Plan review |
 | 4 | Show the owner the plan **and** the reviewers' findings. | **Owner decides** |
 | 5 | Build one task at a time: fresh implementer, then a separate reviewer, then fixes and re-review. **Every task gets a reviewer, including a task you do yourself.** | Task review |
 | 6 | Whole-branch review by an agent on the most capable model. One fix agent for all findings; verify the fixes yourself. | Branch review |
