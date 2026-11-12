@@ -100,6 +100,32 @@ After the owner merges: once the base branch is deployed to the test
 environment, repeat the "Run it" flow there and report the result. The tracker
 card moves to done only after that passed or did not apply.
 
+## Keep the tracker current
+
+When the work comes from an item in an issue tracker (a Trello card, a GitHub
+issue or project item, a Jira or Linear ticket), the item shows where the work
+stands, at the moment it changes. Do this without being asked.
+
+| When | Do |
+|------|-----|
+| You start | Move the item to the "in progress" column or state |
+| The PR is open | Move it to the "in review" column and add the PR link as a comment |
+| The owner merged it | Move it to the "merged" or "deployed to test" column and add a comment: commit, CI result, test-environment check or why none applies |
+| You stop for the owner, or are blocked | Add a comment saying what you are waiting for; leave the column |
+
+- Use the mapping in the project settings. If there is none, read the tracker's
+  own columns or states, pick the ones that match by name, say which you chose,
+  and offer to record the mapping.
+- Do not move an item into a column that belongs to someone else's step
+  (manual testing, release, final "done" sign-off) unless the project settings
+  say you may. Stop at the last column that describes your own work.
+- If no column matches the new state, leave the item where it is and add the
+  comment; do not guess a column.
+- An item with no code to merge (a settings change, a decision) goes to "done"
+  when the change is made and verified.
+- One PR can cover several items: update every one of them.
+- If the work has no tracker item, do not create one unless asked.
+
 ## Gate table (in every PR description)
 
 ```markdown
@@ -151,3 +177,4 @@ commitment, and creating the cards.
 | "I looked at the open PRs' file lists" | A one-line change elsewhere can break a frozen baseline. Read the diffs. |
 | "I'll check in with the owner to be safe" | Outside the stop list, checking in is the failure. Keep going and report in the table. |
 | "It is merged, the card is done" | Done is after the flow works on the test environment. |
+| "I'll update the cards at the end" | Move the item when its state changes. A board that lags the work is wrong for everyone reading it. |
