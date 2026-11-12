@@ -61,10 +61,12 @@ Three things make this checkable:
 1. **Design choices are written down** before building: each non-obvious choice
    and the rule it serves, and what YAGNI left out.
 2. **Tests are written before the code they test.**
-3. **An independent review of the full diff against each of the nine rules**,
-   by an agent that did not write the code and was not told your conclusions.
-   Your own re-read does not count. Every finding is fixed, or listed for the
-   owner with the reason. Its result fills the "Design rules" row below.
+3. **An independent review of the full diff: correctness first, then each of
+   the nine rules**, by an agent that did not write the code and was not told
+   your conclusions. For correctness it looks for wrong conditions, missed
+   cases, behaviour the diff removed, and callers the change breaks. Your own
+   re-read does not count. Every finding is fixed, or listed for the owner
+   with the reason. Its result fills the "Design rules" row below.
 
 ## What scales with risk
 
@@ -134,7 +136,7 @@ stands, at the moment it changes. Do this without being asked.
 | Risk | <level, why> |
 | Plan | <where it is; who reviewed it; findings fixed> |
 | Design rules | SOLID / KISS / DRY / YAGNI / fail loudly / least surprise / cost / behaviour / reversibility: <pass, n/a, or finding and fix, per rule> |
-| Independent review | <who reviewed what; n found, n fixed, n left for owner> |
+| Independent review | <who reviewed what, for correctness and the rules; n found, n fixed, n left for owner> |
 | Tests and pre-push checks | <style, lint, gates: passed, where; tests run locally and why those; full suite: CI result, or local for High risk or cross-cutting> |
 | Run it | <endpoints called, flows walked, in which client, what was seen / no application code> |
 | Open-PR check | <PRs read; conflicts or none> |
