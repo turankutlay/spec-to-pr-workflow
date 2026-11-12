@@ -77,10 +77,17 @@ Three things make this checkable:
 
 Before the push:
 
-- Every pre-push command from the project settings passed.
-- **Run it:** if the diff changes code the application executes, the application
-  was started, every changed endpoint was called, and the user flow was walked
-  in each client that calls it. Test accounts only.
+- **Test what changed, not everything.** The quick pre-push commands (style,
+  lint, gates) run on every push. For the test suite, run locally the tests
+  that cover the changed code: the tests the card names, plus every test file
+  that references a changed class, route or script. The full suite is CI's
+  job; read its result on the PR before calling the work done. Run the full
+  suite locally only when the task is High risk or the diff is cross-cutting
+  (base classes, middleware, helpers, config, migrations, dependencies).
+- **Run it:** if the diff changes code the application executes, start the
+  application and exercise only what the diff touches: call every changed
+  endpoint and walk the user flow that uses it, in each client that calls it.
+  Do not walk flows the diff does not touch. Test accounts only.
 - **Open-PR check:** the diff (not the title or file list) of every open PR
   against the base branch was read for the same files and for anything this
   branch freezes or counts.
@@ -102,7 +109,7 @@ card moves to done only after that passed or did not apply.
 | Plan | <where it is; who reviewed it; findings fixed> |
 | Design rules | SOLID / KISS / DRY / YAGNI / fail loudly / least surprise / cost / behaviour / reversibility: <pass, n/a, or finding and fix, per rule> |
 | Independent review | <who reviewed what; n found, n fixed, n left for owner> |
-| Tests and pre-push checks | <each command: passed, where it ran / not run, why> |
+| Tests and pre-push checks | <style, lint, gates: passed, where; tests run locally and why those; full suite: CI result, or local for High risk or cross-cutting> |
 | Run it | <endpoints called, flows walked, in which client, what was seen / no application code> |
 | Open-PR check | <PRs read; conflicts or none> |
 | Runtime before and after | <numbers / no script, query or hot path changed> |
@@ -139,7 +146,8 @@ commitment, and creating the cards.
 | "Low risk, so no quality review" | Risk scales the rounds, not the bar. Every code PR gets the independent nine-rule review. |
 | "I re-read my diff against the rules" | The author cannot be the independent reviewer. |
 | "The tests pass, no need to start the app" | Tests check what the author thought of. Running it shows what the user gets. |
-| "CI runs the tests anyway" | The project asks for local checks before the push. |
+| "CI runs the tests anyway, I'll run nothing locally" | The tests that cover your change run locally before the push. CI covers the rest, and you read its result. |
+| "To be safe I'll run the whole suite and walk the whole app" | Test what the diff touches. The full suite is CI's job unless the task is High risk or cross-cutting. |
 | "I looked at the open PRs' file lists" | A one-line change elsewhere can break a frozen baseline. Read the diffs. |
 | "I'll check in with the owner to be safe" | Outside the stop list, checking in is the failure. Keep going and report in the table. |
 | "It is merged, the card is done" | Done is after the flow works on the test environment. |
