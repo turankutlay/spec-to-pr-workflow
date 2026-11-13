@@ -101,3 +101,7 @@ gate table (risk, plan, design rules, reviews, tests, how it was run, open-PR
 check, cost, rollback, what was not verified), CI read and fixed, the tracker
 item moved, and a short message naming anything that needs your decision.
 Claude never merges.
+
+## Licence
+
+MIT; see [LICENSE](LICENSE).
