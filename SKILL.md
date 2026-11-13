@@ -95,6 +95,10 @@ Before the push:
   payment, auth, push and storage providers are mocked or faked, and no local
   run may send real mail or charge real money. If you find an existing test
   that does, say so in the PR and propose the fix.
+- **Shared local resources are used by one run at a time.** When several
+  agents or sessions work on one machine, check that no other run is using a
+  shared test database, port or emulator before starting yours; a run that
+  overlapped another is repeated.
 - **Run it.** Decide from the diff, not from the task's label. The contract is
   everything a caller or user can observe:
   - for an HTTP API: status, body shape, headers, redirects;
