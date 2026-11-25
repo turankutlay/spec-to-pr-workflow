@@ -11,58 +11,80 @@ Turn an owner's idea into an approved spec and a set of tracker cards that a
 builder can pick up without guessing. Nothing is built. "Owner" here means
 the person who asked for the work and makes the decisions.
 
-**Core principle:** every decision is the owner's, made one question at a time
-with a reasoned recommendation; every fact comes from the current base branch
-with file:line evidence; every card is checked by reviewers who did not write
-it.
+**Core principle:** start from the problem and how success is measured; every
+decision is the owner's, made one question at a time with a reasoned
+recommendation; every fact comes from the current base branch with file:line
+evidence; every card is checked by reviewers who did not write it, and High
+risk work is also read and signed off by people.
 
-Building each card into a PR is the `spec-to-pr-workflow` skill's job.
+Building each card into a PR is the `spec-to-pr-workflow` skill's job. A short
+worked example of the output is in `example.md`.
 
 ## Steps
 
 Create one task per step and keep the list current.
 
 1. **Read the project settings** (the `## Delivery workflow` section of the
-   project's CLAUDE.md: tracker, base branch, risk rules, where specs live).
-   If there is none, ask once. Then **find existing work.** Search the tracker, specs, project memory or notes (if any) and open PRs for
-   the topic and its neighbours (same tables, same screens, same money paths).
-   Note every person or team that owns nearby work.
-2. **Record the base.** Fetch the base branch of every repo involved and write
+   project's CLAUDE.md: tracker, base branch, risk rules, where specs and
+   decision records live, who signs off). If there is none, ask once.
+2. **Find existing work.** Search the tracker, specs, decision records,
+   project memory or notes (if any) and open PRs for the topic and its
+   neighbours (same tables, same screens, same money paths). Note every
+   person or team that owns nearby work.
+3. **Frame the problem** with the owner before any design question. Do not
+   ask open questions: offer a **draft** for the owner to correct, one part
+   per question in the question format (below): first the customer and their
+   problem with the evidence you found, then the target and guardrail
+   metrics with a date (proposed numbers, marked as guesses), then the
+   alternatives (always including doing nothing and the cheapest option) and
+   what is out of scope. For a refactor, the "customer" is whoever is hurt
+   today, and guardrails ("nothing users see changes") carry most of the
+   weight. If the owner cannot state a measurable goal, record that as a
+   risk; never invent one.
+4. **Record the base.** Fetch the base branch of every repo involved and write
    down each commit. All reading is from that branch (`git show
    origin/<base>:<path>`), never a local checkout.
-3. **Quick audit before questions.** One read-only agent per repo or area,
-   run in parallel, each returning file:line facts: current behaviour, every
-   place the topic is computed, shown or stored, the clients that call it, and
-   what released apps do. Questions come after, grounded in these facts.
-4. **Ask scoping questions one at a time** (format below), working through
-   the question areas (below). Record each answer as a numbered decision
-   (Q1, Q2 …) with the date and the owner's own words.
-5. **Sketch the key screens** (a simple mock or artifact) for anything a user
-   or staff member will see, and let the owner react before the spec is final.
-6. **Write the spec** from the template in `templates.md`, in a place the
+5. **Quick audit before design questions.** One read-only agent per repo or
+   area, in parallel, each returning file:line facts: current behaviour, every
+   place the topic is computed, shown or stored, the clients that call it,
+   what released apps do, and current load or volumes where cost matters.
+6. **Ask design questions one at a time** (format below), working through the
+   question areas (below). Record each answer as a numbered decision (Q1, Q2
+   …) with the date and the owner's own words.
+7. **Sketch the key screens** for anything a user or staff member will see,
+   and let the owner react before the spec is final.
+8. **Write the spec** from the template in `templates.md`, in a place the
    team can open (a shared doc or page, or `docs/` in the repo once approved),
-   never only a local file.
-7. **Review with independent agents**, one aspect each, in parallel (briefs
-   in `reviewer-briefs.md`): facts, card split and delivery, money and
-   behaviour preservation, consistency, and fit with the existing app. Give
-   every reviewer the same exported copy of the spec and cards, and the code;
-   never your conclusions.
-8. **Fix and repeat** under the stop rule (below). A finding that changes
-   behaviour, money, scope or someone else's work becomes a question for the
-   owner, with a recommendation. Everything else is fixed directly. Bump the
-   spec revision and add a line to its revision history each time.
-9. **Owner approval.** Show the spec, the card list, each card's risk and size,
-   and in plain words **every dependency on or from other people's work**.
-   Create nothing before an explicit yes.
-10. **Create the cards** from the card template: description complete on its
-    own, label, repo tag, feature tag. Add an overview card linking the spec,
-    every card and the order. Questions for other people go on question
-    cards assigned to (or mentioning) them.
-11. **Read back** every created card (export them to one file) and check it
+   never only a local file. Fill the sign-off list (below) and the launch
+   plan.
+9. **Review with independent agents**, one aspect each, in parallel (briefs
+   in `reviewer-briefs.md`), scaled to risk (below). Give every reviewer the
+   same exported copy of the spec and cards, and the code; never your
+   conclusions.
+10. **Fix and repeat** under the stop rule (below). A finding that changes
+    behaviour, money, scope, security or someone else's work becomes a
+    question for the owner, with a recommendation. Everything else is fixed
+    directly. Bump the spec revision and add a line to its history each time.
+11. **Sign-off.** The owner approves the spec, the cards with risk and size,
+    and in plain words **every dependency on or from other people's work**.
+    For High risk, every person on the sign-off list reads the final spec and
+    approves their part. Agent reviews come before human sign-off, never
+    instead of it. Create nothing before these yeses.
+12. **Record lasting decisions** as decision records (ADRs, template in
+    `templates.md`) in the repo's decision folder, for every choice that
+    shapes the architecture, data model, public contract or money rules. The
+    first build card commits them if the repo is not yours to write to yet.
+13. **Create the cards** from the card template: description complete on its
+    own, label, repo tag, feature tag. Always include an overview card. Add a
+    clean-up card (with a due date) whenever the work leaves a flag,
+    deprecated field or temporary path behind, and a post-launch review card
+    (dated) whenever the spec sets a target metric. Questions for other
+    people go on question cards addressed to them.
+14. **Read back** every created card (export them to one file) and check it
     against the spec.
-12. **Hand over.** Save decisions, card ids, the base commits and open
-    questions where the next session will find them (project memory, a notes
-    file, or the overview card).
+15. **Hand over.** Save decisions, card ids, base commits and open questions
+    where the next session will find them (project memory, a notes file, or
+    the overview card).
 
 **Before building starts** (often days later): re-audit the base branch, update
 the spec to what changed, and recheck the cards. Code moves.
@@ -97,31 +119,56 @@ Cover every area before the spec is approved; mark the ones that do not apply.
 
 | Area | Ask about |
 |---|---|
+| Problem and success | customer problem, evidence, target and guardrail metrics, alternatives, out of scope |
 | Actors and permissions | who creates, edits, uses; team members; staff roles; admins acting as a user |
 | What each role sees | each user type, team members, the other party in a deal, staff, the public, released apps |
+| Security and privacy | personal or payment data, who can read or change what, impersonation, abuse and fraud, retention |
 | Lifecycle | draft, approval, edit, duplicate, cancel, delete, expiry, account purge |
 | Money | charge, rounding, refunds, cancellations, payouts, tax, invoices, mixed carts |
 | Defaults and limits | defaults on forms, usage limits, time zones, stacking |
 | Concurrency | two users at once, last unit, settle vs change |
+| Performance and cost | expected volume, query cost, rate limits, third-party costs |
 | Notifications | emails, push, in-app, when and to whom |
 | Old clients | released app versions, API contract, forced update |
-| Rollout | kill switch, dormant ship, launch steps, rollback |
+| Launch | staged rollout, guardrails, monitoring and alerts, runbook, kill switch, rollback, clean-up |
 | Legal and copy | terms, FAQs, legal wording, help texts |
-| Reporting and success | what staff and finance need to see; how we know it works after launch (monitoring, logs) |
+| Reporting | what staff and finance need to see |
 | Testing setup | test accounts, seed data, how to switch the feature on in dev, which environments |
+| Sign-off | who besides the owner must approve: security, privacy, legal, finance, design, other teams |
 | Other people's work | open PRs, other teams' cards, who decides on them |
+
+## Reviewers by risk
+
+| Risk | Reviewers (briefs in `reviewer-briefs.md`) | Human sign-off |
+|---|---|---|
+| High (money, auth, personal data, migrations, released clients, several repos) | all six: facts, card split, money and behaviour, consistency, fit with the app, security and privacy | owner plus everyone on the sign-off list |
+| Medium | facts, consistency, fit with the app; security and privacy if personal data or permissions change | owner |
+| Low | facts | owner |
 
 ## Stop rule for reviews
 
-- A round finds something that changes behaviour, money or scope: fix it and
-  run a full round again.
+- A round finds something that changes behaviour, money, security or scope:
+  fix it and run a full round again.
 - A round finds only wording or small gaps: fix them and check only those
   fixes with one targeted reviewer.
-- A full round finds nothing that changes behaviour or money: stop.
+- A full round finds nothing that changes behaviour, money or security: stop.
 
-Scale the reviewers to the risk: all five for High risk (money, auth,
-migrations, released clients, several repos); facts plus consistency for a
-small Medium feature.
+## Launch plan
+
+For High risk, or anything touching money, personal data, a public contract
+or released apps, the full plan below. For other Low or Medium work, one
+line is enough: "ships directly; watch <error tracker> for a day; rollback =
+revert the PR"; add a flag only if a revert is not enough.
+
+- **Stages:** internal or test accounts, then a small share of real users,
+  then everyone; what moves it to the next stage and who decides.
+- **Guardrails:** the metrics that stop or roll back a stage, with
+  thresholds (errors, payment failures, refunds, support tickets).
+- **Monitoring:** the dashboards, logs and alerts that exist before stage
+  one, and who receives the alerts.
+- **Runbook:** how to switch it off, how to roll back, who to call.
+- **Clean-up:** what to remove after full rollout, and when (a card).
+- **Review:** the post-launch review date and the metrics it checks (a card).
 
 ## Other people's work
 
@@ -139,14 +186,18 @@ small Medium feature.
 
 | Mistake | Instead |
 |---|---|
+| Starting from the solution | Frame the problem, metrics and alternatives first |
 | Asking all questions at once, without recommendations | One at a time, reasoned recommendation, what would change it |
-| Questions before the audit | Quick audit first; options grounded in facts |
+| Design questions before the audit | Quick audit first; options grounded in facts |
 | Spec on a base that moved | Record base commits; re-audit before build |
 | Late decisions (visibility, defaults, emails, legal) | Work through the question areas up front |
-| "Fit with the app" found after cards exist | Run it as a reviewer in the first round |
+| "Fit with the app" or a data leak found after cards exist | Run those reviewers in the first round |
+| Agent reviews treated as sign-off | People on the sign-off list approve High risk |
+| On/off switch as the whole launch plan | Stages, guardrails, monitoring, runbook |
+| Flags and deprecated fields left forever | Clean-up card with a due date |
+| Decisions only in the tracker | Decision records in the repo |
 | Reviewers reading different card versions | Export once; every reviewer gets the same file |
 | Scope added as card comments | Update the description; comments for history only |
 | Endless review rounds | Stop rule |
-| Spec only on a local disk | Shared doc or repo `docs/` |
 | Cards without risk, size or done-when | Card template fields are required |
 | Making another team's card wait for yours | Ask the owner; tell them on their card |

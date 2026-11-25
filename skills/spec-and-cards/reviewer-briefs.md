@@ -20,7 +20,10 @@ Is each card one reviewable PR in one repo, with a testable done-when? Are
 dependencies complete, with no cycle, and is each card safe if merged and
 deployed alone? Are risk levels right? Are release steps across repos and
 stores complete (for example: backend before the apps that use it, API
-version gates, a forced mobile update)? Does anything make other people's work wait? Missing cards?
+version gates, a forced mobile update)? Does anything make other people's work wait? Are the
+overview, clean-up and post-launch review cards there, and does the launch
+plan have stages, guardrails, monitoring that exists before stage one, and a
+runbook? Missing cards?
 
 ## 3. Money and behaviour preservation
 For each card merged on its own, and for the feature switched off and then on:
@@ -31,8 +34,9 @@ switch, legacy payment paths, concurrency on counters, account purge, direct
 writes by other apps. Is each rule owned by exactly one card, with a test?
 
 ## 4. Consistency
-Do the owner decisions, design, preservation, rollback, left-out list and
-cards agree? Undefined terms, rules stated two ways, and edge cases the
+Do the problem statement and metrics, alternatives, owner decisions, design,
+preservation, launch plan, rollback, sign-off list, left-out list and cards
+agree? Does every target metric have a way to be measured? Undefined terms, rules stated two ways, and edge cases the
 decisions imply but the design does not answer.
 
 ## 5. Fit with the existing app
@@ -42,3 +46,14 @@ forms, legacy pages, duplicate flows, team members and admins acting as a user, 
 refresh, every text or page that explains the topic (help, FAQ, terms,
 emails), translations, staff screens and reports, audit logs, permissions
 conventions, API docs, privacy of who sees what, test patterns to extend.
+
+## 6. Security and privacy
+Required for High risk. For every role (each user type, team members, the
+other party in a deal, staff, admins acting as a user, the public,
+unauthenticated callers): what can they read, create, change or trigger, and
+is each check on the server? Which personal, payment or business data does
+each response, log, email, export or third-party call carry, and to whom?
+Look for raw model serialisation that leaks new columns, guessable ids or
+codes, missing rate limits, fraud and abuse paths (self-dealing, replay,
+racing for a limited resource), secrets in logs or metadata, and data kept
+longer than needed. Check the problem statement's guardrails cover abuse.

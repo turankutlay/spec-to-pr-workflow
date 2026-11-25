@@ -61,7 +61,10 @@ The code follows nine rules:
 Three things make this checkable:
 
 1. **Design choices are written down** before building: each non-obvious choice
-   and the rule it serves, and what YAGNI left out.
+   and the rule it serves, and what YAGNI left out. A choice that shapes the
+   architecture, data model, public contract or money rules is also written
+   as a decision record in the repo's decision folder (template in the
+   `spec-and-cards` skill's `templates.md`) and linked from the PR.
 2. **Tests are written before the code they test.**
 3. **An independent review of the full diff: correctness first, then each of
    the nine rules**, by an agent that did not write the code and was not told
@@ -74,8 +77,9 @@ Three things make this checkable:
 
 | | Low | Medium | High |
 |---|---|---|---|
-| Plan | Short; goes in the PR description | Written; one independent review against the code; sent to the owner, then continue | Written; independent reviews of spec fit and of design; **owner approves before building** |
+| Plan | Short; goes in the PR description | Written; one independent review against the code; sent to the owner, then continue | Written; independent reviews of spec fit and of design; **owner approves before building**, and so does each person on the spec's sign-off list for their area |
 | Independent quality review (above) | Once, on the full diff | Once, on the full diff, plus a run of the `code-review` skill at high effort with `--fix`, targeted at this branch against the base branch | Per task and on the full diff by the most capable model, plus the same `code-review` run |
+| Security and privacy review | When the diff changes permissions or personal data | Same | Always, on the full diff, by an independent agent: who can read, change or trigger what, data in responses, logs, emails and third-party calls, abuse paths |
 
 Where the table names the `code-review` skill, invoke it; an inline bug hunt
 does not replace it.
@@ -131,7 +135,11 @@ from the log, fixed or re-run, and named in the PR.
 
 After the owner merges: once the base branch is deployed to the test
 environment, repeat the "Run it" flow there for contract changes and report
-the result. Move the tracker item past "merged" only after that passed or did
+the result. When the card is part of a launch (it ships behind a flag or
+turns a feature on), follow the spec's launch plan: the monitoring and alerts
+it names exist before the first stage, each stage moves only on its
+guardrails, and the clean-up and post-launch review cards stay open until
+done. Move the tracker item past "merged" only after that passed or did
 not apply, and no further than the project settings allow. If the session has
 ended by then, the PR says what is left to check there.
 
@@ -196,6 +204,8 @@ stands, at the moment it changes. Do this without being asked.
 | Tests and pre-push checks | <style, lint, gates: passed, where; tests run locally and why those; full suite: CI result, or local for High risk or cross-cutting; external services faked> |
 | Run it | <contract kept: the pinning tests, passing on base and branch / contract changed: entry points exercised, in which client, what was seen / no application code> |
 | Open-PR check | <PRs read; conflicts or none> |
+| Security and privacy | <independent review: findings and fixes / not needed, why> |
+| Launch and monitoring | <flag and stage; alerts and dashboards in place; decision records linked / no user-facing change> |
 | Runtime before and after | <numbers / no script, query or hot path changed> |
 | Rollback | <how to revert; what breaks if only part is deployed> |
 | Not verified | <what, or "nothing"> |

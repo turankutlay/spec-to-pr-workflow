@@ -16,29 +16,44 @@ Turns an idea into an approved spec and tracker cards that a builder can pick
 up without guessing. Nothing is built. Claude:
 
 1. looks for existing work and for other people's work in the same area;
-2. records the base commit of every repo and audits the code first, with
-   file and line evidence, so the questions rest on facts;
-3. asks you scoping questions **one at a time**, each with options, a
+2. frames the problem with you first: the customer and their pain, the
+   evidence, target and guardrail metrics with a date, and the alternatives
+   (always including doing nothing and the cheapest option), offered as a
+   draft for you to correct;
+3. records the base commit of every repo and audits the code, with file and
+   line evidence, so the design questions rest on facts;
+4. asks you design questions **one at a time**, each with options, a
    recommendation **and its reason**, what would change it, and whether the
    choice can be undone later; it works through a checklist of areas (roles,
-   what each role sees, lifecycle, money, defaults, concurrency,
-   notifications, old clients, rollout, legal, reporting, testing setup,
-   other people's work), so late surprises are rare;
-4. sketches the key screens for you to react to;
-5. writes the spec in a place your team can open;
-6. has five independent reviewers check it (facts, card split, money and
-   behaviour preservation, consistency, fit with the existing app), fixes
-   what they find, and repeats under a stop rule;
-7. shows you the spec, the cards and every dependency on other people's work,
-   and creates the cards (plus an overview card) only after your yes;
-8. reads the cards back, and leaves a hand-over for the next session.
+   what each role sees, security and privacy, lifecycle, money, defaults,
+   concurrency, performance, notifications, old clients, launch, legal,
+   reporting, testing setup, sign-off, other people's work);
+5. sketches the key screens for you to react to;
+6. writes the spec in a place your team can open, with a **launch plan**
+   (stages, guardrail metrics, monitoring and alerts in place before the
+   first stage, runbook, clean-up) and a **sign-off list** of who must
+   approve what;
+7. has up to six independent reviewers check it (facts, card split, money
+   and behaviour preservation, consistency, fit with the existing app,
+   security and privacy), scaled to risk, and repeats under a stop rule;
+8. gets your approval, and for High risk the approval of everyone on the
+   sign-off list; agent reviews come before human sign-off, not instead of it;
+9. writes **decision records (ADRs)** for the choices that shape the
+   architecture, data model, public contract or money rules;
+10. creates the cards (overview, build cards with risk, size and a testable
+    "done when", and when needed a clean-up card and a dated post-launch
+    review card), reads them back, and leaves a hand-over.
+
+A worked example of the output is in
+[skills/spec-and-cards/example.md](skills/spec-and-cards/example.md).
 
 Other people's cards are never made to wait for yours without your explicit
 say-so, and questions for colleagues go on question cards addressed to them.
 
 **What it costs:** a High-risk project (money, several repos, released apps)
-runs about five read-only audit agents and five reviewers per round, usually
-two or three rounds. A small feature needs one or two reviewers. In the run
+runs about five read-only audit agents and six reviewers per round, usually
+two or three rounds. A small feature needs one audit agent and three
+reviewers, and a one-line launch plan. In the run
 that shaped this skill, every round found real problems before any code
 existed (a possible deadlock, data leaking to the wrong users, a payment path
 nobody had listed, a dependency that would have blocked a colleague).

@@ -16,5 +16,8 @@ Claude asks for these once.
 - **External services in tests:** <how mail, payments, auth and push are faked>.
 - **Tracker:** <board>; columns: <in progress> → <in review> → <merged / deployed to test>. Columns after that belong to <who>.
 - **Specs and plans:** <folder, or the shared place where specs live>.
+- **Decision records:** <folder for ADRs, e.g. docs/decisions/>.
+- **Sign-off:** <who must approve which kind of change, e.g. security for auth and personal data, finance for money, legal for terms>.
+- **Monitoring:** <where dashboards, logs and alerts live; who is on call>.
 - **Merging:** <who merges; merge commits or squash>.
 ```
