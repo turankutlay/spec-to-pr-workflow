@@ -42,9 +42,10 @@ What stays identical while the feature is off, and every deliberate change
 that applies anyway, each with its test.
 
 ## 7. Launch plan
-Stages and who moves them; guardrails with thresholds; monitoring and alerts
-(in place before stage one, and who receives them); runbook; clean-up; review
-date.
+Stages and who moves them; guardrails with thresholds; error budget;
+monitoring and alerts (in place before stage one, who receives them, the
+alert for each critical path, and the card that builds each); runbook;
+clean-up; review date. Small Low or Medium work: one line.
 
 ## 8. Rollback
 Switch-off, code revert window, partial-deploy states across repos.

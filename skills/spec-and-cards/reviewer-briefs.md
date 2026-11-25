@@ -21,9 +21,10 @@ dependencies complete, with no cycle, and is each card safe if merged and
 deployed alone? Are risk levels right? Are release steps across repos and
 stores complete (for example: backend before the apps that use it, API
 version gates, a forced mobile update)? Does anything make other people's work wait? Are the
-overview, clean-up and post-launch review cards there, and does the launch
-plan have stages, guardrails, monitoring that exists before stage one, and a
-runbook? Missing cards?
+overview, clean-up and post-launch review cards there where needed, and does
+the launch plan have stages, guardrails, an error budget, monitoring that
+exists before stage one, and a runbook? Is every alert and log the plan
+names built by a card whose done-when lists it? Missing cards?
 
 ## 3. Money and behaviour preservation
 For each card merged on its own, and for the feature switched off and then on:
@@ -32,6 +33,9 @@ anything different? Check when a price or rate is fixed, locks and lock order,
 rounding and allocation, refunds, payout records, tax amounts, invoices, kill
 switch, legacy payment paths, concurrency on counters, account purge, direct
 writes by other apps. Is each rule owned by exactly one card, with a test?
+Performance and capacity: compare expected load with the audit's volumes;
+look for query cost and N+1 reads, missing indexes, unbounded lists, long
+locks, timeouts, rate limits and third-party quotas.
 
 ## 4. Consistency
 Do the problem statement and metrics, alternatives, owner decisions, design,

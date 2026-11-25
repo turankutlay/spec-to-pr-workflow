@@ -20,6 +20,11 @@ risk work is also read and signed off by people.
 Building each card into a PR is the `spec-to-pr-workflow` skill's job. A short
 worked example of the output is in `example.md`.
 
+**Not for small work.** If the whole change fits in one small PR and touches
+no money, authentication, personal data, migration, public contract or
+released client, skip this skill: write one card (or hand the task straight
+to `spec-to-pr-workflow`).
+
 ## Steps
 
 Create one task per step and keep the list current.
@@ -164,8 +169,13 @@ revert the PR"; add a flag only if a revert is not enough.
   then everyone; what moves it to the next stage and who decides.
 - **Guardrails:** the metrics that stop or roll back a stage, with
   thresholds (errors, payment failures, refunds, support tickets).
+- **Error budget:** the failure rate the feature may have (for example
+  "payment failures under 0.5% a day" or "99.9% of quotes succeed");
+  spending it pauses the rollout until the cause is fixed.
 - **Monitoring:** the dashboards, logs and alerts that exist before stage
-  one, and who receives the alerts.
+  one, who receives the alerts, and for each money or other critical path
+  the alert that fires if it goes wrong out of hours. Each is built by a
+  named card.
 - **Runbook:** how to switch it off, how to roll back, who to call.
 - **Clean-up:** what to remove after full rollout, and when (a card).
 - **Review:** the post-launch review date and the metrics it checks (a card).

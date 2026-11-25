@@ -35,6 +35,7 @@ level when unsure.
 
 | Level | Typical signs |
 |-------|---------------|
+| Trivial | Text, copy, comments or docs only, or one config value, with no change to what the code does; no money, auth, data, contract or released-client effect. When in doubt, it is Low |
 | Low | Docs, tooling, CI, dead-code removal, mechanical moves fully covered by tests |
 | Medium | Changes code the application runs, with tests covering it: a restructure that keeps the contract, or a feature or fix that changes it for clients deployed together with it |
 | High | Money, authentication, data migration or deletion, a contract used by clients you do not deploy together (third parties, released mobile apps), or code without test coverage |
@@ -68,21 +69,24 @@ Three things make this checkable:
 2. **Tests are written before the code they test.**
 3. **An independent review of the full diff: correctness first, then each of
    the nine rules**, by an agent that did not write the code and was not told
-   your conclusions. For correctness it looks for wrong conditions, missed
+   your conclusions (every risk level except Trivial, see below). For correctness it looks for wrong conditions, missed
    cases, behaviour the diff removed, and callers the change breaks. Your own
    re-read does not count. Every finding is fixed, or listed for the owner
    with the reason. Its result fills the "Design rules" row below.
 
 ## What scales with risk
 
-| | Low | Medium | High |
-|---|---|---|---|
-| Plan | Short; goes in the PR description | Written; one independent review against the code; sent to the owner, then continue | Written; independent reviews of spec fit and of design; **owner approves before building**, and so does each person on the spec's sign-off list for their area |
-| Independent quality review (above) | Once, on the full diff | Once, on the full diff, plus a run of the `code-review` skill at high effort with `--fix`, targeted at this branch against the base branch | Per task and on the full diff by the most capable model, plus the same `code-review` run |
-| Security and privacy review | When the diff changes permissions or personal data | Same | Always, on the full diff, by an independent agent: who can read, change or trigger what, data in responses, logs, emails and third-party calls, abuse paths |
+| | Trivial | Low | Medium | High |
+|---|---|---|---|---|
+| Plan | One line in the PR description | Short; goes in the PR description | Written; one independent review against the code; sent to the owner, then continue | Written; independent reviews of spec fit and of design; **owner approves before building**, and so does each person on the spec's sign-off list for their area |
+| Independent quality review (above) | None: the owner's PR review is the review | Once, on the full diff | Once, on the full diff, plus a run of the `code-review` skill at high effort with `--fix`, targeted at this branch against the base branch | Per task and on the full diff by the most capable model, plus the same `code-review` run |
+| Security and privacy review | None | When the diff changes permissions or personal data | Same | Always, on the full diff, by an independent agent: who can read, change or trigger what, data in responses, logs, emails and third-party calls, abuse paths |
+| Tests and "Run it" | Quick pre-push commands; a screenshot if visible text changed | As in "Definition of done" | Same | Same, plus the full suite locally |
+| Gate table | Short form (below) | Full | Full | Full |
 
 Where the table names the `code-review` skill, invoke it; an inline bug hunt
-does not replace it.
+does not replace it. A Trivial PR that turns out to change behaviour is
+re-rated and gets the full gates.
 
 ## Definition of done
 
@@ -123,6 +127,13 @@ Before the push:
   entry point the way its callers do, in every client that calls it (browser,
   emulator, CLI shell), with test accounts: the main path and the main error
   case. Do not exercise what the diff does not touch.
+- **Observability ships with the code.** A PR that adds or changes a money
+  path or another critical path also adds the logs, metrics and alerts the
+  spec names for it (without a spec: at least a structured log line for each
+  outcome and an alert on its error rate), and lists them in the gate table.
+- **Leftovers get a clean-up card.** A PR that adds a feature flag,
+  deprecated field or temporary path links the card that removes it, or
+  creates one with a due date if none exists.
 - **Open-PR check:** the diff (not the title or file list) of every open PR
   against the base branch was read for the same files, and for changes that
   would break a baseline, snapshot or count this branch relies on.
@@ -205,10 +216,20 @@ stands, at the moment it changes. Do this without being asked.
 | Run it | <contract kept: the pinning tests, passing on base and branch / contract changed: entry points exercised, in which client, what was seen / no application code> |
 | Open-PR check | <PRs read; conflicts or none> |
 | Security and privacy | <independent review: findings and fixes / not needed, why> |
-| Launch and monitoring | <flag and stage; alerts and dashboards in place; decision records linked / no user-facing change> |
+| Launch and monitoring | <flag and stage; logs, metrics and alerts added and the error budget they watch; clean-up card for any flag or deprecated field; decision records linked / no user-facing change> |
 | Runtime before and after | <numbers / no script, query or hot path changed> |
 | Rollback | <how to revert; what breaks if only part is deployed> |
 | Not verified | <what, or "nothing"> |
+```
+
+Short form for Trivial PRs:
+
+```markdown
+| Gate | Result |
+|------|--------|
+| Risk | Trivial: <why: text/config only, no behaviour change> |
+| Checks | <pre-push commands run; screenshot if visible text changed> |
+| Rollback | Revert the PR |
 ```
 
 ## Stop for the owner only when

@@ -82,6 +82,9 @@ changed behaviour is also run in the real client (browser, emulator, CLI).
 
 **What it costs** (agent runs per PR):
 
+- **Trivial** (text, copy, docs or one config value, no change to what the
+  code does): the change and the quick pre-push checks only; your PR review
+  is the review.
 - **Low risk:** the implementation, plus one independent review agent.
 - **Medium risk:** the above, plus an independent plan review and a run of the
   `code-review` skill (which starts its own reviewers).
