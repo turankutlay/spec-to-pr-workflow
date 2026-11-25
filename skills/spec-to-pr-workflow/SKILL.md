@@ -1,14 +1,15 @@
 ---
 name: spec-to-pr-workflow
-description: Use when starting a refactor or multi-PR piece of work that needs a spec and tracker cards, when picking up a tracker card or task to turn into a pull request, when about to execute an implementation plan, or when about to push a branch and open a pull request
+description: Use when picking up a tracker card or task to turn into a pull request, when about to execute an implementation plan, or when about to push a branch and open a pull request
 ---
 
 # Spec to PR workflow
 
 ## Overview
 
-The owner hands over a task and gets back a pull request that is tested, run,
-reviewed for quality and ready to merge, with the evidence in one table.
+The owner (the person who asked for the work and decides) hands over a task
+and gets back a pull request that is tested, run, reviewed for quality and
+ready to merge, with the evidence in one table.
 
 This skill fixes three things: **what done means**, **the quality the code must
 have**, and **when to stop for the owner**. How you get there is your choice:
@@ -25,7 +26,7 @@ branch, pre-push commands and how to run them when the local runtime is the
 wrong version, how to start the application and its clients, test accounts,
 test environment, how external services are faked in tests, tracker, and how
 the project rates risk. If the section is missing, ask the owner once and offer
-to add it (the skill's README has a template).
+to add it (template: `settings-template.md` next to this skill).
 
 ## Risk
 
@@ -34,6 +35,7 @@ level when unsure.
 
 | Level | Typical signs |
 |-------|---------------|
+| Trivial | Text, copy, comments or docs only, or one config value, with no change to what the code does; no money, auth, data, contract or released-client effect. When in doubt, it is Low |
 | Low | Docs, tooling, CI, dead-code removal, mechanical moves fully covered by tests |
 | Medium | Changes code the application runs, with tests covering it: a restructure that keeps the contract, or a feature or fix that changes it for clients deployed together with it |
 | High | Money, authentication, data migration or deletion, a contract used by clients you do not deploy together (third parties, released mobile apps), or code without test coverage |
@@ -60,24 +62,31 @@ The code follows nine rules:
 Three things make this checkable:
 
 1. **Design choices are written down** before building: each non-obvious choice
-   and the rule it serves, and what YAGNI left out.
+   and the rule it serves, and what YAGNI left out. A choice that shapes the
+   architecture, data model, public contract or money rules is also written
+   as a decision record in the repo's decision folder (template in the
+   `spec-and-cards` skill's `templates.md`) and linked from the PR.
 2. **Tests are written before the code they test.**
 3. **An independent review of the full diff: correctness first, then each of
    the nine rules**, by an agent that did not write the code and was not told
-   your conclusions. For correctness it looks for wrong conditions, missed
+   your conclusions (every risk level except Trivial, see below). For correctness it looks for wrong conditions, missed
    cases, behaviour the diff removed, and callers the change breaks. Your own
    re-read does not count. Every finding is fixed, or listed for the owner
    with the reason. Its result fills the "Design rules" row below.
 
 ## What scales with risk
 
-| | Low | Medium | High |
-|---|---|---|---|
-| Plan | Short; goes in the PR description | Written; one independent review against the code; sent to the owner, then continue | Written; independent reviews of spec fit and of design; **owner approves before building** |
-| Independent quality review (above) | Once, on the full diff | Once, on the full diff, plus a run of the `code-review` skill at high effort with `--fix`, targeted at this branch against the base branch | Per task and on the full diff by the most capable model, plus the same `code-review` run |
+| | Trivial | Low | Medium | High |
+|---|---|---|---|---|
+| Plan | One line in the PR description | Short; goes in the PR description | Written; one independent review against the code; sent to the owner, then continue | Written; independent reviews of spec fit and of design; **owner approves before building**, and so does each person on the spec's sign-off list for their area |
+| Independent quality review (above) | None: the owner's PR review is the review | Once, on the full diff | Once, on the full diff, plus a run of the `code-review` skill at high effort with `--fix`, targeted at this branch against the base branch | Per task and on the full diff by the most capable model, plus the same `code-review` run |
+| Security and privacy review | None | When the diff changes permissions or personal data | Same | Always, on the full diff, by an independent agent: who can read, change or trigger what, data in responses, logs, emails and third-party calls, abuse paths |
+| Tests and "Run it" | Quick pre-push commands; a screenshot if visible text changed | As in "Definition of done" | Same | Same, plus the full suite locally |
+| Gate table | Short form (below) | Full | Full | Full |
 
 Where the table names the `code-review` skill, invoke it; an inline bug hunt
-does not replace it.
+does not replace it. A Trivial PR that turns out to change behaviour is
+re-rated and gets the full gates.
 
 ## Definition of done
 
@@ -118,6 +127,13 @@ Before the push:
   entry point the way its callers do, in every client that calls it (browser,
   emulator, CLI shell), with test accounts: the main path and the main error
   case. Do not exercise what the diff does not touch.
+- **Observability ships with the code.** A PR that adds or changes a money
+  path or another critical path also adds the logs, metrics and alerts the
+  spec names for it (without a spec: at least a structured log line for each
+  outcome and an alert on its error rate), and lists them in the gate table.
+- **Leftovers get a clean-up card.** A PR that adds a feature flag,
+  deprecated field or temporary path links the card that removes it, or
+  creates one with a due date if none exists.
 - **Open-PR check:** the diff (not the title or file list) of every open PR
   against the base branch was read for the same files, and for changes that
   would break a baseline, snapshot or count this branch relies on.
@@ -130,7 +146,11 @@ from the log, fixed or re-run, and named in the PR.
 
 After the owner merges: once the base branch is deployed to the test
 environment, repeat the "Run it" flow there for contract changes and report
-the result. Move the tracker item past "merged" only after that passed or did
+the result. When the card is part of a launch (it ships behind a flag or
+turns a feature on), follow the spec's launch plan: the monitoring and alerts
+it names exist before the first stage, each stage moves only on its
+guardrails, and the clean-up and post-launch review cards stay open until
+done. Move the tracker item past "merged" only after that passed or did
 not apply, and no further than the project settings allow. If the session has
 ended by then, the PR says what is left to check there.
 
@@ -195,9 +215,21 @@ stands, at the moment it changes. Do this without being asked.
 | Tests and pre-push checks | <style, lint, gates: passed, where; tests run locally and why those; full suite: CI result, or local for High risk or cross-cutting; external services faked> |
 | Run it | <contract kept: the pinning tests, passing on base and branch / contract changed: entry points exercised, in which client, what was seen / no application code> |
 | Open-PR check | <PRs read; conflicts or none> |
+| Security and privacy | <independent review: findings and fixes / not needed, why> |
+| Launch and monitoring | <flag and stage; logs, metrics and alerts added and the error budget they watch; clean-up card for any flag or deprecated field; decision records linked / no user-facing change> |
 | Runtime before and after | <numbers / no script, query or hot path changed> |
 | Rollback | <how to revert; what breaks if only part is deployed> |
 | Not verified | <what, or "nothing"> |
+```
+
+Short form for Trivial PRs:
+
+```markdown
+| Gate | Result |
+|------|--------|
+| Risk | Trivial: <why: text/config only, no behaviour change> |
+| Checks | <pre-push commands run; screenshot if visible text changed> |
+| Rollback | Revert the PR |
 ```
 
 ## Stop for the owner only when
@@ -221,12 +253,13 @@ its CI is green.
 
 ## New piece of work: spec and cards first
 
-For a refactor or anything spanning several PRs: ask scoping questions one at a
-time with a recommendation; audit the latest base branch with evidence (file
-and line); write a spec and a card list with a risk level per card; have
-independent agents check the spec (facts, card split, behaviour preservation,
-consistency); fix the findings. The owner approves the design, the size of the
-commitment, and creating the cards.
+For a refactor or feature spanning several PRs, follow the `spec-and-cards`
+skill: the full process from idea to approved spec and checked tracker cards
+(audit first, one reasoned question at a time, independent reviewers scaled
+to risk with a stop rule, cards with risk and size, other people's work never
+made to wait).
+The owner approves the design, the size of the commitment, and creating the
+cards.
 
 ## Common mistakes
 
