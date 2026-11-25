@@ -1,0 +1,12 @@
+{
+  "name": "spec-to-pr-workflow",
+  "description": "Two Claude Code skills: spec-and-cards turns an idea into an approved spec and checked tracker cards; spec-to-pr-workflow turns a card into a tested, reviewed pull request.",
+  "version": "2.0.0",
+  "author": {
+    "name": "Turan Kutlay Künbi"
+  },
+  "homepage": "https://github.com/turankutlay/spec-to-pr-workflow",
+  "repository": "https://github.com/turankutlay/spec-to-pr-workflow",
+  "license": "MIT",
+  "keywords": ["skills", "spec", "planning", "tracker", "pull-request", "code-review", "workflow"]
+}

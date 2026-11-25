@@ -1,14 +1,15 @@
 ---
 name: spec-to-pr-workflow
-description: Use when starting a refactor or multi-PR piece of work that needs a spec and tracker cards, when picking up a tracker card or task to turn into a pull request, when about to execute an implementation plan, or when about to push a branch and open a pull request
+description: Use when picking up a tracker card or task to turn into a pull request, when about to execute an implementation plan, or when about to push a branch and open a pull request
 ---
 
 # Spec to PR workflow
 
 ## Overview
 
-The owner hands over a task and gets back a pull request that is tested, run,
-reviewed for quality and ready to merge, with the evidence in one table.
+The owner (the person who asked for the work and decides) hands over a task
+and gets back a pull request that is tested, run, reviewed for quality and
+ready to merge, with the evidence in one table.
 
 This skill fixes three things: **what done means**, **the quality the code must
 have**, and **when to stop for the owner**. How you get there is your choice:
@@ -25,7 +26,7 @@ branch, pre-push commands and how to run them when the local runtime is the
 wrong version, how to start the application and its clients, test accounts,
 test environment, how external services are faked in tests, tracker, and how
 the project rates risk. If the section is missing, ask the owner once and offer
-to add it (the skill's README has a template).
+to add it (template: `settings-template.md` next to this skill).
 
 ## Risk
 
@@ -221,12 +222,13 @@ its CI is green.
 
 ## New piece of work: spec and cards first
 
-For a refactor or anything spanning several PRs: ask scoping questions one at a
-time with a recommendation; audit the latest base branch with evidence (file
-and line); write a spec and a card list with a risk level per card; have
-independent agents check the spec (facts, card split, behaviour preservation,
-consistency); fix the findings. The owner approves the design, the size of the
-commitment, and creating the cards.
+For a refactor or feature spanning several PRs, follow the `spec-and-cards`
+skill: the full process from idea to approved spec and checked tracker cards
+(audit first, one reasoned question at a time, independent reviewers scaled
+to risk with a stop rule, cards with risk and size, other people's work never
+made to wait).
+The owner approves the design, the size of the commitment, and creating the
+cards.
 
 ## Common mistakes
 

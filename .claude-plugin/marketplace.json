@@ -1,0 +1,18 @@
+{
+  "name": "turankutlay",
+  "description": "Claude Code skills by Turan Kutlay Künbi",
+  "owner": {
+    "name": "Turan Kutlay Künbi"
+  },
+  "plugins": [
+    {
+      "name": "spec-to-pr-workflow",
+      "source": "./",
+      "description": "spec-and-cards (idea to approved spec and checked tracker cards) and spec-to-pr-workflow (card to tested, reviewed pull request).",
+      "author": {
+        "name": "Turan Kutlay Künbi"
+      },
+      "category": "productivity"
+    }
+  ]
+}
